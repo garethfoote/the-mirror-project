@@ -4,19 +4,9 @@
 """
 import nltk
 
-
-class Tag:
-    tag = ''
-    word = ''
-    def __init__(self, tag, word):
-        self.tag = tag
-        self.word = word
-
 class POSTagging:
     """Accepts sentences and categorises words into word classes (verb, noun, adjective)"""
-    wordtags = [Tag('ADJ', 'adjective'), Tag('ADV', 'adverb'),
-                Tag('N', 'noun'), Tag('NP', 'proper noun'), Tag('PRO', 'proper noun'),
-                Tag('V', 'verb'), Tag('MOD', 'modal verb')]
+    wordtags = ['adverb', 'adjective', 'noun', 'pronoun', 'verb']
     tagdict = nltk.data.load('help/tagsets/brown_tagset.pickle')
     tagdict_b = nltk.data.load('help/tagsets/upenn_tagset.pickle')
     tagdict_c = nltk.data.load('help/tagsets/claws5_tagset.pickle')
