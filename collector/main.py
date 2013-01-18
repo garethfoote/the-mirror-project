@@ -1,4 +1,6 @@
-from postagging import POSTagging
+from postagging import POSTagger
 
-posT = POSTagging()
-posT.tagSentence('And now for something completely different')
+post = POSTagger()
+alltags = post.list_tags(['noun', 'verb', 'adjective'])
+print "%s\nlength:%s" % (''.join(alltags), str(len(alltags)))
+#posT.tag_sentence('And now for something completely different')
