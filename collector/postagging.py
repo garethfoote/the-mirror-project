@@ -2,30 +2,33 @@
     Dependencies:
     pyyaml nltk numpy (http://nltk.org/install.html)
 """
+from collections import namedtuple
 from nltk.tag import pos_tag
 from nltk.tokenize import word_tokenize
 from nltk.data import load
 
-class POSTagger:
+class PartOfSpeechTagger:
     """Accepts sentences and categorises words into word classes (verb, noun, adjective)"""
     tags = []
-    wordtags = ['adverb', 'adjective', 'noun', 'pronoun', 'verb']
+    wordtags = ['RB', 'JJ', 'JJR', 'AJS', 'NN', 'NNS', 'NN1', 'PN', 'VB']
     tagdict = load('help/tagsets/brown_tagset.pickle')
     tagdict_b = load('help/tagsets/upenn_tagset.pickle')
     tagdict_c = load('help/tagsets/claws5_tagset.pickle')
 
     def __init__(self, wordtags=[]):
-        self.wordtags = wordtags
+        if len(wordtags) > 0:
+            self.wordtags = wordtags
 
     def tag_sentence(self, sentence):
         self.tags = pos_tag(word_tokenize(sentence))
-        # for tag in self.tags:
-        #     print tag[0]  + ' - ' + tag[1] + ' - ' + self.explain_tag(tag[1])
+        return self.tags
 
     def get_by_class(self):
-        words=namedtuple('literal', self.wordtags)(**{'name': 'John Smith', 'age':23})
-        # for tag in self.tags:
-        #     print tag[0]  + ' - ' + tag[1] + ' - ' + self.explain_tag(tag[1])
+        words = dict((tag, []) for tag in self.wordtags)
+        for tag in self.tags:
+            if tag[1] in words:
+                words[tag[1]].append(tag[0])
+        return words
 
     def list_tags(self, filters=[]):
         output = []
