@@ -11,9 +11,9 @@ class PartOfSpeechTagger:
     """Accepts sentences and categorises words into word classes (verb, noun, adjective)"""
     tags = []
     wordtags = ['RB', 'JJ', 'JJR', 'AJS', 'NN', 'NNS', 'NN1', 'PN', 'VB']
-    tagdict = load('help/tagsets/brown_tagset.pickle')
-    tagdict_b = load('help/tagsets/upenn_tagset.pickle')
-    tagdict_c = load('help/tagsets/claws5_tagset.pickle')
+    tagdict = []
+    tagdict_b = []
+    tagdict_c = []
 
     def __init__(self, wordtags=[]):
         if len(wordtags) > 0:
@@ -22,6 +22,18 @@ class PartOfSpeechTagger:
     def tag_sentence(self, sentence):
         self.tags = pos_tag(word_tokenize(sentence))
         return self.tags
+
+    def get_formatted(self, format):
+        output = ''
+        for tag in self.tags:
+            if tag[1] in self.wordtags:
+                output += format % (tag[1], tag[0]) + " "
+            else:
+                if tag[0] == '.':
+                    output = output[:-1] + tag[0]
+                else:
+                    output += tag[0] + " "
+        return output
 
     def get_by_class(self):
         words = dict((tag, []) for tag in self.wordtags)
@@ -33,6 +45,12 @@ class PartOfSpeechTagger:
     def list_tags(self, filters=[]):
         output = []
         alldicts = {}
+
+        if len(self.tagdict) == 0:
+            self.tagdict = load('help/tagsets/brown_tagset.pickle')
+            self.tagdict_b = load('help/tagsets/upenn_tagset.pickle')
+            self.tagdict_c = load('help/tagsets/claws5_tagset.pickle')
+
         # Fastest method for concatenating dictionaries - http://stackoverflow.com/questions/1781571/how-to-concatenate-two-dictionaries-to-create-a-new-one-in-python
         alldicts = dict(self.tagdict, **self.tagdict_b)
         alldicts.update(self.tagdict_c)
