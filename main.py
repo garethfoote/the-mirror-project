@@ -7,4 +7,4 @@ with open('debug.log', 'w'):
 logging.basicConfig(filename='debug.log',level=logging.DEBUG)
 
 collector = Collector(['traverse-test'])
-collector.startTraverse()
+collector.start()

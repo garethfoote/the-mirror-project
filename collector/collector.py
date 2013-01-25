@@ -1,4 +1,8 @@
-import re
+import re, datetime, logging, json, copy, operator, os, grp, pwd
+from stat import *
+from collections import namedtuple
+from itertools import groupby
+
 from partofspeechtagger import PartOfSpeechTagger
 from traverse import Traverse
 from textparser.parser import *
@@ -8,32 +12,105 @@ class Collector:
     def __init__(self, dirs):
         self.__traverse = Traverse(dirs)
         self.__posTagger = PartOfSpeechTagger(['RB', 'JJ', 'JJR', 'AJS', 'NN', 'NNS', 'NN1', 'PN', 'VB', 'VBP'])
+        self.__taggedData = dict()
+        self.__initOutputs()
 
-    def startTraverse(self):
+
+    def start(self):
         self.__traverse.restrict({'maxSize': 20*1024*1024 })
-        self.__traverse.allowTypes(['text/html'])
+
+        # self.__traverse.allowTypes(['application/msword'])
+        self.__traverse.allowTypes(['text/html', 'text/plain','application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/rtf', 'application/vnd.oasis.opendocument.text'])
+        # traverse.allowTypes(['text/plain', 'text/html', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.oasis.opendocument.text', 'application/rtf'])
+
         self.__traverse.onFilePass += self.__fileFoundHandler
         self.__traverse.start()
-        # traverse.allowTypes(['text/plain', 'text/html', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
+        self.__output.write(json.dumps(self.__taggedData))
+        self.__progressLog.truncate(0)
 
-    def __initParser(self, data, mimeType):
-       return {
-            'text/plain': TextParser(data),
-            'text/html': HTMLTextParser(data, { "acceptedTags":['p','h1']}),
-            'application/msword': HTMLTextParser(data),
-            }[mimeType]
+
+    def __initOutputs(self):
+        # now = datetime.datetime.now()
+        # nowFormatted = now.strftime("%y-%m-%d-%H%M%S")
+        # Need this file to be consitent when app is run multiple times.
+        nowFormatted = ''
+        # Progress
+        progressLog = 'collector/progress/progress%s.log' % nowFormatted
+        # Clear log.
+        open(progressLog,'w').close()
+        # Open in append mode.
+        self.__progressLog = open(progressLog, 'a')
+        # Output
+        output = 'output/flanagan%s.json' % nowFormatted
+        self.__output = open(output, 'w')
+
 
     def __fileFoundHandler(self, filePath, mimeType):
+        # Write to stdout.
         print "File found: %s - %s" % (filePath, mimeType)
-        f = open(filePath, 'r')
-        data = f.read()
-        parser = self.__initParser(data, mimeType);
-        parsedData = parser.parse()
-        self.__tagText(parsedData)
+        # Open file (read only).
+        try:
+            with open(filePath, 'r') as f:
+                data = f.read()
+        except IOError:
+            self.__handleIOError(filePath)
+        else:
+            # Get parser dependant on mimetype and do some taggging.
+            parser = self.__initParser(data, filePath, mimeType);
+            parsedData = parser.parse()
+            # Use POSTagger to tag words in parsed text/data.
+            self.__posTagger.tag(parsedData)
+            self.__merge(self.__posTagger.getByClass())
+            # If merge is successful write this filePath to progres log.
+            self.__progressLog.write(filePath+'\n')
+            f.close()
 
-    def __tagText(self, text):
-        self.__posTagger.tag_sentence(text)
-        print self.__posTagger.get_by_class()
+
+    def __initParser(self, data, filePath, mimeType):
+
+        config = { "acceptedTags": ["p", "h1"], "filePath": filePath }
+        return {
+            'text/plain': TextParser(data),
+            'text/html': HTMLTextParser(data, config),
+            'application/rtf': RTFDocParser(data, config),
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document': MSDocXParser('', config),
+            'application/vnd.oasis.opendocument.text': ODTDocParser('', config),
+            #'application/msword': RTFDocParser(data, config),
+            }[mimeType]
+
+    def __merge(self, newData):
+        # Alphabetise words for grouping.
+        for tagKey in newData:
+            newData[tagKey] = sorted(newData[tagKey])
+        if len(self.__taggedData) == 0:
+            # No data yet as this is first file and this is not a
+            # continuation of previous scan.
+            for tagKey in newData:
+                self.__taggedData[tagKey] = {key: len(list(group)) for key, group in groupby(newData[tagKey])}
+        else:
+            # Either data exists from prior files or from a partial json
+            # file created during a previous scan.
+            for tagKey in newData:
+                for word in newData[tagKey]:
+                    if word in self.__taggedData[tagKey]:
+                        self.__taggedData[tagKey][word] = self.__taggedData[tagKey][word] + 1
+                    else:
+                        self.__taggedData[tagKey][word] = 1
+
+    def __orderByFrequency(self):
+        for tagKey in self.__taggedData:
+            self.__taggedData[tagKey] = sorted(self.__taggedData[tagKey].iteritems(), key=operator.itemgetter(1), reverse=True)
+            print self.__taggedData[tagKey]
+
+    def __handleIOError(self, filePath):
+        # If IO error then write mask, user and group to log.
+        statInfo = os.stat(filePath)
+        user = pwd.getpwuid(statInfo.st_uid)[0]
+        group = grp.getgrgid(statInfo.st_gid)[0]
+        permMask = str(oct(statInfo[ST_MODE] & 0777))
+        errorMsg = 'Cannot open file %s. [mask: %s, user: %s, group: %s]' % (filePath, permMask, user, group)
+        logging.error(errorMsg)
+        print '[ERROR] ' + errorMsg
 
 """
 # Part of Speech Tagging

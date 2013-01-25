@@ -19,11 +19,11 @@ class PartOfSpeechTagger:
         if len(wordtags) > 0:
             self.wordtags = wordtags
 
-    def tag_sentence(self, sentence):
-        self.tags = pos_tag(word_tokenize(sentence))
+    def tag(self, data):
+        self.tags = pos_tag(word_tokenize(data))
         return self.tags
 
-    def get_formatted(self, format):
+    def getFormatted(self, format):
         output = ''
         for tag in self.tags:
             if tag[1] in self.wordtags:
@@ -35,7 +35,7 @@ class PartOfSpeechTagger:
                     output += tag[0] + " "
         return output
 
-    def get_by_class(self):
+    def getByClass(self):
         words = dict((tag, []) for tag in self.wordtags)
         for tag in self.tags:
             if tag[1] in words:

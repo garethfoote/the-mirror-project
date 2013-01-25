@@ -1,14 +1,10 @@
-"""
-    Dependencies:
-"""
 import os, logging
 from os.path import join, getsize
 from mimetypes import guess_type
-
 from gfte.events.eventhook import *
 
 class Traverse:
-
+    """Traverse specified dirs and test"""
     def __init__(self, root_dirs=['traverse-test']):
         self.__roots = root_dirs
         self.__config = { 'maxSize': 0 }
@@ -16,7 +12,6 @@ class Traverse:
         self.onFilePass = EventHook()
 
     def start(self):
-        """Start traversal"""
         # Traverse from specified start point
         for dir in self.__roots:
             for root, dirs, files in os.walk(dir):
@@ -24,7 +19,7 @@ class Traverse:
                 for name in files:
                     fullPath = join(root, name)
                     if self.__fileSuccess(fullPath) == True:
-                        self.onFilePass.fire(fullPath)
+                        self.onFilePass.fire(fullPath, guess_type(fullPath)[0])
 
     def allowTypes(self, permittedTypes):
         self.__permittedTypes = permittedTypes
@@ -42,7 +37,7 @@ class Traverse:
             passed = True
 
         if passed == False:
-            logging.info('[%s] Type: %s not permitted.' % (file, type[0]))
+            logging.info('Type not permitted. Cannot use file %s. Type: %s.' % (file, type[0]))
 
         # If passed successfully, check against maxSize restrictions
         if passed == True and self.__config['maxSize'] > 0:
