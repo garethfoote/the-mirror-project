@@ -1,0 +1,6 @@
+[submodule "docx"]
+	path = docx
+	url = https://github.com/mikemaccana/python-docx.git
+[submodule "collector/textparser/docx"]
+	path = collector/textparser/docx
+	url = https://github.com/mikemaccana/python-docx.git
