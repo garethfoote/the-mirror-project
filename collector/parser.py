@@ -2,12 +2,14 @@
 Dependencies:
     docx  - https://github.com/mikemaccana/python-docx.git (docx)
     pyth - http://pypi.python.org/pypi/pyth/ (RTF)
+    pdfminer - https://github.com/euske/pdfminer (PDF)
 """
 import re, sys, zipfile
 from HTMLParser import HTMLParser
 from docx.docx import *
 from pyth.plugins.rtf15.reader import Rtf15Reader
 from pyth.plugins.plaintext.writer import PlaintextWriter
+from pyPdf import PdfFileWriter, PdfFileReader
 
 class TextParser(object):
     """Abstract parsing class"""
@@ -19,10 +21,10 @@ class TextParser(object):
         return self._data
 
 
-class HTMLTextParser(TextParser):
+class HTMLDocParser(TextParser):
     """Concrete HTML parser"""
     def __init__(self, data, config=[]):
-        super(HTMLTextParser, self).__init__(data, config)
+        super(HTMLDocParser, self).__init__(data, config)
         self.__parsedData = ""
         self.__nativeHTMLParser = HTMLParser()
         self.__collect = False
@@ -66,10 +68,10 @@ class MSDocXParser(TextParser):
 
 
 
-class RTFDocParser(TextParser):
+class RTFParser(TextParser):
     """Concrete RTF document parser"""
     def __init__(self, data, config=[]):
-        super(RTFDocParser, self).__init__(data, config)
+        super(RTFParser, self).__init__(data, config)
         self.__parsedData = ""
 
     def parse(self):
@@ -80,10 +82,10 @@ class RTFDocParser(TextParser):
 
 
 
-class ODTDocParser(TextParser):
+class ODTParser(TextParser):
     """ Open Office document parser"""
     def __init__(self, data, config=[]):
-        super(ODTDocParser, self).__init__(data, config)
+        super(ODTParser, self).__init__(data, config)
         self.__nativeHTMLParser = HTMLParser()
         self.__parsedData = ""
 
@@ -98,3 +100,18 @@ class ODTDocParser(TextParser):
 
     def __handle_data(self, data):
         self.__parsedData += data + "\n"
+
+
+class PDFParser(TextParser):
+    """docstring for PDFParser"""
+    def __init__(self, data, config=[]):
+        super(PDFParser, self).__init__(data, config)
+        self.__parsedData = ""
+
+    def parse(self):
+        pdfFile = open(self._config['filePath'], 'rb')
+        reader  = PdfFileReader(pdfFile)
+        numPages = reader.getNumPages()
+        while(numPages > 0):
+            self.__parsedData += reader.getPage(numPages-1).extractText()
+            numPages = numPages-1
