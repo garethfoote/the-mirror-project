@@ -4,4 +4,4 @@
 	url = https://github.com/mikemaccana/python-docx
 [submodule "lib/pdfminer"]
 	path = lib/pdfminer
-	url = https://github.com/euske/pdfminer
+	url = git@github.com:euske/pdfminer.git
