@@ -5,7 +5,7 @@ from itertools import groupby
 
 from partofspeechtagger import PartOfSpeechTagger
 from traverse import Traverse
-from textparser.parser import *
+from parser import *
 
 class Collector:
     """Collector application"""
@@ -35,7 +35,7 @@ class Collector:
         # Need this file to be consitent when app is run multiple times.
         nowFormatted = ''
         # Progress
-        progressLog = 'collector/progress/progress%s.log' % nowFormatted
+        progressLog = 'collector/progress%s.log' % nowFormatted
         # Clear log.
         open(progressLog,'w').close()
         # Open in append mode.

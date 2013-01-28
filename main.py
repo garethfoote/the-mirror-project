@@ -1,4 +1,5 @@
-import logging
+import logging, sys
+sys.path.append(r'./lib')
 from collector.collector import *
 
 # Logging
