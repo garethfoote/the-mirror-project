@@ -115,3 +115,5 @@ class PDFParser(TextParser):
         while(numPages > 0):
             self.__parsedData += reader.getPage(numPages-1).extractText()
             numPages = numPages-1
+
+        return self.__parsedData

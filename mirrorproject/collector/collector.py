@@ -19,8 +19,8 @@ class Collector:
     def start(self):
         self.__traverse.restrict({'maxSize': 20*1024*1024 })
 
-        self.__traverse.allowTypes(['application/pdf'])
-        # self.__traverse.allowTypes(['text/html', 'text/plain','application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/rtf', 'application/vnd.oasis.opendocument.text', 'application/pdf'])
+        # self.__traverse.allowTypes(['application/pdf'])
+        self.__traverse.allowTypes(['text/html', 'text/plain','application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/rtf', 'application/vnd.oasis.opendocument.text', 'application/pdf'])
         # traverse.allowTypes(['text/plain', 'text/html', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.oasis.opendocument.text', 'application/rtf'])
 
         self.__traverse.onFilePass += self.__fileFoundHandler
@@ -58,7 +58,6 @@ class Collector:
             # Get parser dependant on mimetype and do some taggging.
             parser = self.__initParser(data, filePath, mimeType);
             parsedData = parser.parse()
-            exit()
             # Use POSTagger to tag words in parsed text/data.
             self.__posTagger.tag(parsedData)
             self.__merge(self.__posTagger.getByClass())
