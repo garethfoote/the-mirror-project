@@ -75,7 +75,6 @@ tar xzf virtualenv-$VERSION.tar.gz
 # Create the first "bootstrkyp" environment.
 log "[INFO]Initial virtual env install: $INITIAL_ENV"
 $PYTHON virtualenv-$VERSION/virtualenv.py $ENV_OPTS $INITIAL_ENV
-
 # Don't need this anymore.
 rm -rf virtualenv-$VERSION
 # Install virtualenv into the environment.
