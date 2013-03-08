@@ -1,0 +1,11 @@
+PIL==1.1.7
+PyYAML==3.10
+argparse==1.2.1
+elementtree==1.2.7-20070827-preview
+lxml==3.1beta1
+nltk==2.0.4
+numpy==1.6.2
+pdfminer==20110515
+pyPdf==1.13
+pyth==0.5.6
+wsgiref==0.1.2
