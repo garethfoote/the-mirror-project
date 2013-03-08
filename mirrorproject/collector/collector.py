@@ -6,12 +6,13 @@ from itertools import groupby
 from partofspeechtagger import PartOfSpeechTagger
 from traverse import Traverse
 from parser import *
-
 class Collector:
+
     """Collector application"""
-    def __init__(self, dirs):
-        self.__traverse = Traverse(dirs)
-        self.__posTagger = PartOfSpeechTagger(['RB', 'JJ', 'JJR', 'AJS', 'NN', 'NNS', 'NN1', 'PN', 'VB', 'VBP'])
+    def __init__(self, config, wordTags):
+        self._config = config
+        self.__traverse = Traverse(config.dirs)
+        self.__posTagger = PartOfSpeechTagger(wordTags)
         self.__taggedData = dict()
         self.__initOutputs()
 
@@ -19,9 +20,9 @@ class Collector:
     def start(self):
         self.__traverse.restrict({'maxSize': 20*1024*1024 })
 
-        # self.__traverse.allowTypes(['application/pdf'])
-        self.__traverse.allowTypes(['text/html', 'text/plain','application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/rtf', 'application/vnd.oasis.opendocument.text', 'application/pdf'])
-        # traverse.allowTypes(['text/plain', 'text/html', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.oasis.opendocument.text', 'application/rtf'])
+        # Debugging.
+        # self.__traverse.allowTypes(['application/rtf'])
+        self.__traverse.allowTypes(self._config.acceptedFiles)
 
         self.__traverse.onFilePass += self.__fileFoundHandler
         self.__traverse.start()
@@ -41,7 +42,7 @@ class Collector:
         # Open in append mode.
         self.__progressLog = open(progressLog, 'a')
         # Output
-        output = 'output/flanagan%s.json' % nowFormatted
+        output = '%sflanagan%s.json' % (self._config.output, nowFormatted)
         self.__output = open(output, 'w')
 
 
@@ -68,7 +69,7 @@ class Collector:
 
     def __initParser(self, data, filePath, mimeType):
 
-        config = { "acceptedTags": ["p", "h1"], "filePath": filePath }
+        config = { "acceptedTags": self._config.htmltags, "filePath": filePath }
         return {
             'text/plain': TextParser(data),
             'text/html': HTMLDocParser(data, config),
@@ -113,27 +114,3 @@ class Collector:
         logging.error(errorMsg)
         print '[ERROR] ' + errorMsg
 
-"""
-# Part of Speech Tagging
-pos_tagger = PartOfSpeechTagger(['RB', 'JJ', 'JJR', 'AJS', 'NN', 'NNS', 'NN1', 'PN', 'VB', 'VBP'])
-
-# Get list of all tag shortcode and their defintion+examples
-# alltags = pos_tagger.list_tags(['noun', 'verb', 'adjective'])
-# print "%s\nlength:%s" % (''.join(alltags), str(len(alltags)))
-
-# Pass sentence to PoS Tagger and categorise by class
-# print pos_tagger.tag_sentence('And now for something completely different')
-pos_tagger.tag_sentence('They refuse to permit us to obtain the refuse permit. The rain in spain falls mainly on the plain.')
-print pos_tagger.get_formatted("<replace class='%s'>%s</replace>")
-# print pos_tagger.get_by_class()
-
-# RB - Adverb
-# JJ - Adjective or numeral, ordinal
-# JJR - Adjective comparative
-# AJS - superaltive adjective
-# NN - noun, common, singular
-# NNS - noun, common, plural
-# NN1 - singular noun
-# PN = pronoun
-# VB - verb, base form
-"""

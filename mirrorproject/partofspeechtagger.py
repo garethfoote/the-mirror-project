@@ -2,6 +2,7 @@
     Dependencies:
     pyyaml nltk numpy (http://nltk.org/install.html)
 """
+import re
 from collections import namedtuple
 from nltk.tag import pos_tag
 from nltk.tokenize import word_tokenize
@@ -10,7 +11,7 @@ from nltk.data import load
 class PartOfSpeechTagger:
     """Accepts sentences and categorises words into word classes (verb, noun, adjective)"""
     tags = []
-    wordtags = ['RB', 'JJ', 'JJR', 'AJS', 'NN', 'NNS', 'NN1', 'PN', 'VB']
+    wordtags = []
     tagdict = []
     tagdict_b = []
     tagdict_c = []
@@ -20,28 +21,46 @@ class PartOfSpeechTagger:
             self.wordtags = wordtags
 
     def tag(self, data):
+        self.__data = data
         self.tags = pos_tag(word_tokenize(data))
         return self.tags
 
     def getFormatted(self, format):
-        output = ''
+        dataOut = ''
+
         for tag in self.tags:
-            if tag[1] in self.wordtags:
-                output += format % (tag[1], tag[0]) + " "
+
+            # Find strpos of word
+            strstart = self.__data.index(tag[0])
+            strend = strstart + len(tag[0])
+
+            # If tag is in required type list.
+            if tag[1] not in [',','.'] and (len(self.wordtags) == 0 or tag[1] in self.wordtags):
+                output = format % (tag[1], tag[0])
             else:
-                if tag[0] == '.':
-                    output = output[:-1] + tag[0]
-                else:
-                    output += tag[0] + " "
-        return output
+                output = tag[0]
+
+            # Replace in original data string to
+            # ensure format retention (i.e. \n & \t)
+            dataOut  += self.__data[:strstart] + output
+            self.__data = self.__data[strend:]
+
+        return dataOut
+
 
     def getByClass(self):
+        if len(self.wordtags) == 0:
+            for tag in self.tags:
+                if tag[1] not in self.wordtags:
+                    self.wordtags.append(tag[1])
+
         words = dict((tag, []) for tag in self.wordtags)
         for tag in self.tags:
             if tag[1] in words:
                 # words[tag[1]].append(tag[0].decode('unicode_escape'))
                 words[tag[1]].append(tag[0])
         return words
+
 
     def list_tags(self, filters=[]):
         output = []
@@ -89,3 +108,11 @@ class PartOfSpeechTagger:
             return '?'
 
         return data[0]
+
+    def findnth(self, haystack, needle, n):
+
+        # parts=re.split('\b(' + needle + ')\b', haystack, n+1)
+        parts = haystack.split(needle, n+1)
+        if len(parts)<=n+1:
+            return -1
+        return len(haystack)-len(parts[-1])-len(needle)
