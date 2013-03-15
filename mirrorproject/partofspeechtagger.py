@@ -79,10 +79,10 @@ class PartOfSpeechTagger:
             if len(filters) > 0:
                 for f in filters:
                     if descr.find(f) > -1:
-                        output.append("%s%s\n" % (tag, descr))
+                        output.append("%s\t%s" % (tag, descr))
                         break
             else:
-                output.append("%s%s\n" % (tag, descr))
+                output.append("%s\t%s" % (tag, descr))
 
         return output
 
