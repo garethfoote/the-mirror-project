@@ -42,8 +42,12 @@ class Collector:
         # Open in append mode.
         self.__progressLog = open(progressLog, 'a')
         # Output
-        output = '%sflanagan%s.json' % (self._config.output, nowFormatted)
-        self.__output = open(output, 'w')
+        output = '%scollector%s.json' % (self._config.output, nowFormatted)
+        try:
+            self.__output = open(output, 'w')
+        except IOError as e:
+            print "[ERROR] Directory %s does not exist. Check config.cfg and create directory if necessary" % self._config.output
+            raise
 
 
     def __fileFoundHandler(self, filePath, mimeType):
