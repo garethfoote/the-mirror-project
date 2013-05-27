@@ -2,11 +2,29 @@
 
 source setup.cfg
 
+# Clone and update any git submodules.
+git submodule init
+git submodule update
+
 LOG=the-mirror-env01.log
 # Log function.
 function log {
     echo $1
     echo $1 >> $LOG
+}
+function getUrl {
+
+    if [[ -n $(which curl) ]];
+    then
+        curl -O $1
+    elif [[ -n $(which wget) ]];
+    then
+        wget $1
+    else
+        echo "[ERROR]No curl or wget! OMG!"
+        echo "[ERROR]No curl or wget! OMG!" >> $LOG
+        exit
+    fi
 }
 
 # Get parameters
@@ -54,17 +72,7 @@ touch $LOG
 if [ ! -f virtualenv-$VERSION.tar.gz ];
 then
     echo "Downloading!"
-    if [[ -n $(which curl) ]];
-    then
-        curl -O $URL_BASE/virtualenv-$VERSION.tar.gz
-    elif [[ -n $(which wget) ]];
-    then
-        wget $URL_BASE/virtualenv-$VERSION.tar.gz
-    else
-        echo "[ERROR]No curl or wget! OMG!"
-        echo "[ERROR]No curl or wget! OMG!" >> $LOG
-        exit
-    fi
+    getUrl $URL_BASE/virtualenv-$VERSION.tar.gz
 fi
 if [ ! -f virtualenv-$VERSION.tar.gz ];
 then
@@ -96,7 +104,13 @@ then
     sudo apt-get install ${PYTHON}-dev libxml2-dev libxslt-dev
 elif [[ "$(uname -s)" == *Darwin* ]] 
 then
-    STATIC_DEPS=true
+
+    # Get and install gcc compiler
+    if [[ ! -n $(which gcc) ]];
+    then
+        log "[ERROR] Missing GNU C Compiler (GCC). Download and install from here: https://github.com/kennethreitz/osx-gcc-installer/downloads"
+        exit
+    fi
     log "[INFO]Darwin (OSx) - Do not install python-dev"
 fi
 
@@ -109,6 +123,8 @@ fi
 log "[INFO]Installing PIP requirements"
 pip install -r requirements.txt
 
-log "[INFO]Downloading NLTK data to ${TARGET_DIR}"
-# Install nltk data.
-python -m nltk.downloader -d ${TARGET_DIR}nltk_data all
+if [ ! -d "$TARGET_DIR}nltk_data" ]; then
+    log "[INFO]Downloading NLTK data to ${TARGET_DIR}nltk_data"
+    # Install nltk data.
+    python -m nltk.downloader -d ${TARGET_DIR}nltk_data all
+fi
