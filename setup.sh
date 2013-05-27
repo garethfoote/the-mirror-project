@@ -6,7 +6,7 @@ source setup.cfg
 git submodule init
 git submodule update
 
-LOG=the-mirror-env01.log
+LOG=${INITIAL_ENV}.log
 # Log function.
 function log {
     echo $1
@@ -108,7 +108,7 @@ then
     # Get and install gcc compiler
     if [[ ! -n $(which gcc) ]];
     then
-        log "[ERROR] Missing GNU C Compiler (GCC). Download and install from here: https://github.com/kennethreitz/osx-gcc-installer/downloads"
+        log "[ERROR] Missing GNU C Compiler (GCC). Download and install appropriate pkg for your operating system here: https://github.com/kennethreitz/osx-gcc-installer/downloads"
         exit
     fi
     log "[INFO]Darwin (OSx) - Do not install python-dev"
