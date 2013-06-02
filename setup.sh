@@ -2,10 +2,6 @@
 
 source setup.cfg
 
-# Clone and update any git submodules.
-git submodule init
-git submodule update
-
 LOG=${INITIAL_ENV}.log
 # Log function.
 function log {
