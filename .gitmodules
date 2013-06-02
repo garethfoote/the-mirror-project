@@ -1,3 +1,0 @@
-[submodule "mirrorproject/lib/docx"]
-	path = mirrorproject/lib/docx
-	url = git://github.com/mikemaccana/python-docx.git
