@@ -9,7 +9,7 @@ Python application for traversing specified hard drive directories on *nix (Linu
 
 ## Install me
 
-* `git clone git@github.com:garethfoote/the-mirror-project.git`
+* `git clone git://github.com/garethfoote/the-mirror-project.git`
 * `cd the-mirror-project`
 * `chmod +x run.sh`
 * `./setup.sh`
