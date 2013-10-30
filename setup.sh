@@ -2,7 +2,7 @@
 
 source setup.cfg
 
-LOG=${INITIAL_ENV}.log
+LOG=${TARGET_DIR}env.log
 # Log function.
 function log {
     echo $1
@@ -56,7 +56,6 @@ done
 
 # Select current version of virtualenv:
 VERSION=1.10.1
-LOG=the-mirror-env01.log
 # Options for your first environment:
 ENV_OPTS='--no-site-packages --distribute'
 # Set to whatever python interpreter you want for your first environment: (only tested with 2.7)
@@ -97,7 +96,7 @@ fi
 if [[ "$(uname -s)" == *Linux* ]]
 then
     log "[INFO]Installing python dev.";
-    sudo apt-get install ${PYTHON}-dev libxml2-dev libxslt-dev
+    sudo apt-get install python-dev libxml2-dev libxslt-dev
 elif [[ "$(uname -s)" == *Darwin* ]] 
 then
 
@@ -118,7 +117,7 @@ then
 fi
 log "[INFO]Installing PIP requirements"
 pip install -r requirements.txt
-if [ ! -d "$TARGET_DIR}nltk_data" ]; then
+if [ ! -d "${TARGET_DIR}nltk_data" ]; then
 
     log "[INFO]Downloading NLTK data to ${TARGET_DIR}nltk_data"
     # Install nltk data.
