@@ -64,7 +64,7 @@ URL_BASE=http://pypi.python.org/packages/source/v/virtualenv
 #log
 touch $LOG
 
-# --- Real work starts here ---
+# --- Download virtual env ---
 if [ ! -f virtualenv-$VERSION.tar.gz ];
 then
     echo "Downloading: $URL_BASE/virtualenv-$VERSION.tar.gz"
@@ -75,6 +75,8 @@ then
     log "[ERROR]File does not exist. Either did not download or curl/wget not installed."
     exit
 fi
+
+# --- Extract, install and activate env ---
 tar xzf virtualenv-$VERSION.tar.gz
 # Create the first "bootstrap" environment.
 log "[INFO]Initial virtual env install: $INITIAL_ENV"
@@ -85,13 +87,18 @@ rm -rf virtualenv-$VERSION
 $INITIAL_ENV/bin/pip install virtualenv-$VERSION.tar.gz
 # Activate env.
 source $INITIAL_ENV/bin/activate
-# Check that hte python execuatble is running from here.
+
+# --- Check install was successful and tidy ---
 PYTHONEXEC=`python -c "import sys; print sys.executable"`
 PYTHONENVDIR=${PYTHONEXEC/\/${INITIAL_ENV}\/bin\/python/""}
 PWD=`pwd`
+# Is python executable in this directory opposed to e.g. /usr/bin
 if [ "$PWD" == "$PYTHONENVDIR" ]; then
     log "[*]virtualenv installation successful! \o/"
+    # Tidying.
+    rm virtualenv-$VERSION.tar.gz
 fi
+
 # Install python-dev if on Linux. Hoping it is present on OSx.
 if [[ "$(uname -s)" == *Linux* ]]
 then
@@ -100,7 +107,7 @@ then
 elif [[ "$(uname -s)" == *Darwin* ]] 
 then
 
-    # Get and install gcc compiler
+    # Notify the gcc (C compiler) is missing
     if [[ ! -n $(which gcc) ]];
     then
         log "[ERROR] Missing GNU C Compiler (GCC). Download and install appropriate pkg for your operating system here: https://github.com/kennethreitz/osx-gcc-installer/downloads"
@@ -109,8 +116,8 @@ then
     log "[INFO]Darwin (OSx) - Do not install python-dev"
 fi
 
+# --- Install python dependencies ---
 if [ ! -f requirements.txt ]
-# Install python dependencies.
 then
     log "[ERROR]requirements.txt does not exist."
     exit
@@ -120,6 +127,6 @@ pip install -r requirements.txt
 if [ ! -d "${TARGET_DIR}nltk_data" ]; then
 
     log "[INFO]Downloading NLTK data to ${TARGET_DIR}nltk_data"
-    # Install nltk data.
+    # Install nltk data. (This will take a while)
     python -m nltk.downloader -d ${TARGET_DIR}nltk_data all
 fi
