@@ -11,7 +11,7 @@ Python application for traversing specified hard drive directories on *nix (Linu
 
 * `git clone git://github.com/garethfoote/the-mirror-project.git`
 * `cd the-mirror-project`
-* `chmod +x run.sh`
+* `chmod +x setup.sh`
 * `./setup.sh`
 
 ## Run me - Collector application.
