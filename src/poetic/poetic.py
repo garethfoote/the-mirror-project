@@ -1,5 +1,6 @@
 from partofspeechtagger import PartOfSpeechTagger
 from lxml import etree
+import os
 
 class Poetic:
     """Poetic parser """
@@ -8,16 +9,56 @@ class Poetic:
         self.__posTagger = PartOfSpeechTagger(wordTags)
 
     def start(self):
-        self.parse()
-        self.output()
+        if os.path.isdir( self._config.input ):
+            self.__outputDir = self._config.input + '/output/'
+            self.createoutputdir();
 
-    def parse(self):
-        self.__input = etree.parse(self._config.input)
+            # Loop dir for files to parse.
+            for f in os.listdir( self._config.input ):
+                if os.path.isfile( self._config.input + f ):
+                    self.parse( self._config.input + f )
+        else:
+            dir = os.path.dirname( self._config.input )
+            self.__outputDir = dir + '/output/'
+            self.createoutputdir();
 
-        for poem in self.__input.findall('poem'):
-            self.__posTagger.tag(poem.text);
-            tagged = self.__posTagger.getFormatted(self._config.format)
-            poem.text = etree.CDATA(tagged)
+            self.parse( self._config.input )
+
+
+    def createoutputdir(self):
+        if os.path.exists(self.__outputDir) == False:
+            os.makedirs(self.__outputDir)
+
+    def parse(self, filepath):
+        print "Parsing: "+ filepath
+
+        try:
+            self.__input = etree.parse(filepath)
+        except etree.XMLSyntaxError:
+            self.__input = open(filepath, 'r')
+
+        # Create output file for writing
+        output = open(self.__outputDir + os.path.basename(filepath), 'a+');
+
+        # Create to compare against input.
+        tree = etree.ElementTree(etree.Element("root"))
+        if type(self.__input) == type(tree):
+            # Loop through all poems
+            for poem in self.__input.findall('poem'):
+                self.__posTagger.tag(poem.text);
+                tagged = self.__posTagger.getFormatted(self._config.format)
+                poem.text = etree.CDATA(tagged)
+
+            # Write all at once.
+            self.__input.write(output)
+        else:
+            lineOutput = ''
+            # Loop through lines in files.
+            for line in self.__input:
+                # Write line by line (append).
+                self.__posTagger.tag(line);
+                lineOutput = self.__posTagger.getFormatted(self._config.format)
+                output.write(lineOutput+'\n');
 
         return self.__input
 

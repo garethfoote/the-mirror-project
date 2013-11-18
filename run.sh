@@ -10,4 +10,4 @@ source $INITIAL_ENV/bin/activate
 export NLTK_DATA=${PWD}/nltk_data 
 # Change to correct directory and run app.
 cd src
-python main.py
+python main.py --type poemparse
