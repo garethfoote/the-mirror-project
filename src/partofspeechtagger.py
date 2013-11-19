@@ -30,6 +30,9 @@ class PartOfSpeechTagger:
 
         for tag in self.tags:
 
+            # TODO - Accomodate for double quotation marks.
+            # NLTK doesn't handle them as expected.
+
             # Find strpos of word
             strstart = self.__data.index(tag[0])
             strend = strstart + len(tag[0])

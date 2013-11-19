@@ -38,27 +38,45 @@ class Poetic:
             self.__input = open(filepath, 'r')
 
         # Create output file for writing
-        output = open(self.__outputDir + os.path.basename(filepath), 'a+');
+        outputf = open(self.__outputDir + os.path.basename(filepath), 'w+');
 
-        # Create to compare against input.
-        tree = etree.ElementTree(etree.Element("root"))
-        if type(self.__input) == type(tree):
+        outputroot = etree.Element("output")
+        # Create ElementTree to compare against input
+        outputtree = etree.ElementTree(outputroot)
+        # If input is an XML document...
+        if type(self.__input) == type(outputtree):
             # Loop through all poems
             for poem in self.__input.findall('poem'):
-                self.__posTagger.tag(poem.text);
-                tagged = self.__posTagger.getFormatted(self._config.format)
-                poem.text = etree.CDATA(tagged)
+                for line in iter(poem.text.splitlines()):
+                    # print line
+                    self.__posTagger.tag(line);
+                    lineoutput = self.__posTagger.getFormatted(self._config.format)
+                    lineoutput = "<line>"+lineoutput+"</line>"
+                    # print "linetagged:"+lineoutput
+                    poem.text = ""
+                    poem.append( etree.fromstring(lineoutput) )
 
-            # Write all at once.
-            self.__input.write(output)
+            # ...then output is also an xml document.
+            self.__input.write(outputf)
         else:
-            lineOutput = ''
+            lineoutput = ''
             # Loop through lines in files.
             for line in self.__input:
                 # Write line by line (append).
                 self.__posTagger.tag(line);
-                lineOutput = self.__posTagger.getFormatted(self._config.format)
-                output.write(lineOutput+'\n');
+                lineoutput = self.__posTagger.getFormatted(self._config.format)
+
+                if self._config.forceXMLOutput == "true":
+                    lineoutput = "<line>"+lineoutput+"</line>"
+                    outputroot.append( etree.fromstring(lineoutput) )
+                else:
+                    # Or else write it line by line.
+                    outputf.write(lineoutput+'\n');
+
+            if self._config.forceXMLOutput == "true":
+                outputtree.write(outputf, pretty_print=True)
+                # print etree.tostring(outputroot, pretty_print=True)
+
 
         return self.__input
 
