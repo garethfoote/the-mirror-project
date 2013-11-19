@@ -24,12 +24,16 @@ class Poetic:
 
             self.parse( self._config.input )
 
-
     def createoutputdir(self):
         if os.path.exists(self.__outputDir) == False:
             os.makedirs(self.__outputDir)
 
     def parse(self, filepath):
+
+        bn = os.path.basename(filepath)
+        if bn.startswith('.') or bn.endswith('~'):
+            return
+
         print "Parsing: "+ filepath
 
         try:
@@ -38,7 +42,7 @@ class Poetic:
             self.__input = open(filepath, 'r')
 
         # Create output file for writing
-        outputf = open(self.__outputDir + os.path.basename(filepath), 'w+');
+        outputf = open(self.__outputDir + bn, 'w+');
 
         outputroot = etree.Element("output")
         # Create ElementTree to compare against input
@@ -51,10 +55,12 @@ class Poetic:
                     # print line
                     self.__posTagger.tag(line);
                     lineoutput = self.__posTagger.getFormatted(self._config.format)
-                    lineoutput = "<line>"+lineoutput+"</line>"
-                    # print "linetagged:"+lineoutput
                     poem.text = ""
-                    poem.append( etree.fromstring(lineoutput) )
+                    linenode = etree.SubElement(poem, "line")
+                    linenode.append( etree.fromstring('<tags>'+lineoutput+'</tags>') )
+                    originalnode = etree.SubElement(linenode, "original")
+                    originalnode.text = etree.CDATA(line)
+                    # print "linetagged:"+lineoutput
 
             # ...then output is also an xml document.
             self.__input.write(outputf)
@@ -67,8 +73,10 @@ class Poetic:
                 lineoutput = self.__posTagger.getFormatted(self._config.format)
 
                 if self._config.forceXMLOutput == "true":
-                    lineoutput = "<line>"+lineoutput+"</line>"
-                    outputroot.append( etree.fromstring(lineoutput) )
+                    linenode = etree.SubElement(outputroot, "line")
+                    linenode.append( etree.fromstring('<tags>'+lineoutput+'</tags>') )
+                    originalnode = etree.SubElement(linenode, "original")
+                    originalnode.text = etree.CDATA(line)
                 else:
                     # Or else write it line by line.
                     outputf.write(lineoutput+'\n');
