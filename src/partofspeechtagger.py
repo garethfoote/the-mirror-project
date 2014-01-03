@@ -7,6 +7,7 @@ from collections import namedtuple
 from nltk.tag import pos_tag
 from nltk.tokenize import word_tokenize
 from nltk.data import load
+from lxml import etree
 
 class PartOfSpeechTagger:
     """Accepts sentences and categorises words into word classes (verb, noun, adjective)"""
@@ -25,7 +26,10 @@ class PartOfSpeechTagger:
         self.tags = pos_tag(word_tokenize(data))
         return self.tags
 
-    def getFormatted(self, format):
+    def printAll(self):
+        print self.tags
+
+    def getFormatted(self, format, asXML=True):
         dataOut = ''
 
         for tag in self.tags:
@@ -41,12 +45,17 @@ class PartOfSpeechTagger:
             if tag[1] not in [',','.'] and (len(self.wordtags) == 0 or tag[1] in self.wordtags):
                 output = format % (tag[1], tag[0])
             else:
-                output = tag[0]
+                output = format % ("NONE", tag[0])
 
             # Replace in original data string to
             # ensure format retention (i.e. \n & \t)
             dataOut  += self.__data[:strstart] + output
             self.__data = self.__data[strend:]
+
+        if asXML == True:
+            outputroot = etree.fromstring("<tags>"+dataOut+"</tags>")
+            outputtree = etree.ElementTree(outputroot)
+            dataOut = outputroot
 
         return dataOut
 

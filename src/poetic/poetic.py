@@ -1,90 +1,96 @@
 from partofspeechtagger import PartOfSpeechTagger
 from lxml import etree
-import os
+import os, sys
+from copy import deepcopy
 
 class Poetic:
+
     """Poetic parser """
     def __init__(self, config, wordTags):
         self._config = config
         self.__posTagger = PartOfSpeechTagger(wordTags)
 
     def start(self):
+        # If this is directory.
         if os.path.isdir( self._config.input ):
-            self.__outputDir = self._config.input + '/output/'
-            self.createoutputdir();
+            self.createoutputdir(self._config.input);
 
             # Loop dir for files to parse.
             for f in os.listdir( self._config.input ):
                 if os.path.isfile( self._config.input + f ):
                     self.parse( self._config.input + f )
-        else:
-            dir = os.path.dirname( self._config.input )
-            self.__outputDir = dir + '/output/'
-            self.createoutputdir();
 
+        # else is a single file for parsing.
+        else:
+            directory = os.path.dirname( self._config.input )
+            self.createoutputdir( directory );
             self.parse( self._config.input )
 
-    def createoutputdir(self):
+    def createoutputdir(self, directory):
+        self.__outputDir = directory + '/output/'
+
         if os.path.exists(self.__outputDir) == False:
             os.makedirs(self.__outputDir)
 
     def parse(self, filepath):
 
+        # Protect against hidden files.
         bn = os.path.basename(filepath)
         if bn.startswith('.') or bn.endswith('~'):
             return
 
         print "Parsing: "+ filepath
 
-        try:
-            self.__input = etree.parse(filepath)
-        except etree.XMLSyntaxError:
-            self.__input = open(filepath, 'r')
+        # Read file.
+        self.__input = open(filepath, 'r')
+
+        # If basename is not xml then make sure output IS xml.
+        if filepath[-3:] != "xml":
+            bn = bn[:-3] + "xml"
 
         # Create output file for writing
         outputf = open(self.__outputDir + bn, 'w+');
 
+        # Remove all newlines before passing to NLP lib.
+        inputlines = self.__input.read().splitlines()
+        inputnolines = ' '.join([str(x).strip() for x in inputlines])
+
+        # Pass poem through NLP lib.
+        self.__posTagger.tag(inputnolines.rstrip());
+        output = self.__posTagger.getFormatted(self._config.format)
+        #print etree.tostring(output);
+        # for element in output.iter():
+            # print("%s - %s" % (element.tag, element.text))
+
+        # Create ElementTree root for output.
         outputroot = etree.Element("output")
-        # Create ElementTree to compare against input
         outputtree = etree.ElementTree(outputroot)
-        # If input is an XML document...
-        if type(self.__input) == type(outputtree):
-            # Loop through all poems
-            for poem in self.__input.findall('poem'):
-                for line in iter(poem.text.splitlines()):
-                    # print line
-                    self.__posTagger.tag(line);
-                    lineoutput = self.__posTagger.getFormatted(self._config.format)
-                    poem.text = ""
-                    linenode = etree.SubElement(poem, "line")
-                    linenode.append( etree.fromstring('<tags>'+lineoutput+'</tags>') )
-                    originalnode = etree.SubElement(linenode, "original")
-                    originalnode.text = etree.CDATA(line)
-                    # print "linetagged:"+lineoutput
 
-            # ...then output is also an xml document.
-            self.__input.write(outputf)
-        else:
-            lineoutput = ''
-            # Loop through lines in files.
-            for line in self.__input:
-                # Write line by line (append).
-                self.__posTagger.tag(line);
-                lineoutput = self.__posTagger.getFormatted(self._config.format)
+        # Loop through lines in files.
+        for line in inputlines:
 
-                if self._config.forceXMLOutput == "true":
-                    linenode = etree.SubElement(outputroot, "line")
-                    linenode.append( etree.fromstring('<tags>'+lineoutput+'</tags>') )
-                    originalnode = etree.SubElement(linenode, "original")
-                    originalnode.text = etree.CDATA(line)
-                else:
-                    # Or else write it line by line.
-                    outputf.write(lineoutput+'\n');
+            # Create base nodes.
+            linenode = etree.SubElement(outputroot, "line")
+            linetags = etree.SubElement(linenode, "tags")
+            originalnode = etree.SubElement(linenode, "original")
 
-            if self._config.forceXMLOutput == "true":
-                outputtree.write(outputf, pretty_print=True)
-                # print etree.tostring(outputroot, pretty_print=True)
+            # For each line break into words and extract class
+            # from NLP output.
+            for word in line.split():
+                for el in output.iter():
+                    eltext = str(el.text)
+                    # print "Searching for: %s - %s" % (eltext, word[:len(eltext)])
+                    if eltext == word[:len(eltext)]:
+                        # print "MATCH! Type = %s" % el.get("class")
+                        # Add to linenode.tags & remove from output.
+                        if el.get("class") != "NONE":
+                            linetags.append( deepcopy(el) );
+                        el.getparent().remove( el );
+                        break
 
+            originalnode.text = etree.CDATA(line)
+
+        outputtree.write(outputf, pretty_print=True)
 
         return self.__input
 

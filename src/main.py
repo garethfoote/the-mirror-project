@@ -14,7 +14,7 @@ logging.basicConfig(filename='debug.log',level=logging.DEBUG)
 cfg = Config('../config.cfg')
 
 parser = argparse.ArgumentParser(description='Start either Collector or Poetic Parsing application.')
-parser.add_argument('--type', metavar='t', help='determine type of application to run: "collector" or "poemparser". (default:"collector")', default='collector', required=False)
+parser.add_argument('--type', metavar='t', help='Determine type of application to run: "collector" or "poemparser". (default:"collector")', default='collector', required=False)
 
 args = parser.parse_args()
 exectype = args.type
