@@ -1,0 +1,19 @@
+When the computer sees the word apple,
+It sees a company
+When the computer sees apple and pear together
+It thinks of fruit
+
+Understanding an entity is
+Abstraction down a path
+Formed by Bayesian learning
+The concept -> entity
+
+Co-occurance
+For the trees used in science are not brown and green
+But probabilistic
+In the collocations 'apple tree', 'apple pie',
+
+You should see a pink box
+Explaining
+Individual is ('apple')
+What properties it has ('red')
