@@ -32,7 +32,6 @@
       <tag class="VBD">fast</tag>
       <tag class="IN">with</tag>
       <tag class="NN">sleepless</tag>
-      <tag class="-NONE-">eyes</tag>
     </tags>
     <original><![CDATA[Hold it fast with sleepless eyes, ]]></original>
   </line>
@@ -55,7 +54,6 @@
       <tag class="NN">bosom</tag>
       <tag class="DT">the</tag>
       <tag class="NNS">mountains</tag>
-      <tag class="-NONE-">grow</tag>
     </tags>
     <original><![CDATA[Out of my bosom the mountains grow, ]]></original>
   </line>

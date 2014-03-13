@@ -30,7 +30,6 @@
       <tag class="PRP$">your</tag>
       <tag class="JJ">own</tag>
       <tag class="NNS">life's</tag>
-      <tag class="-NONE-">mission</tag>
     </tags>
     <original><![CDATA[your own life's mission:]]></original>
   </line>
@@ -69,7 +68,6 @@
       <tag class="JJ">chores</tag>
       <tag class="VBN">rapunzelled</tag>
       <tag class="RP">out</tag>
-      <tag class="-NONE-">windows</tag>
     </tags>
     <original><![CDATA[of their chores, rapunzelled out windows,]]></original>
   </line>
@@ -100,7 +98,6 @@
       <tag class="NNP">Just</tag>
       <tag class="RB">so</tag>
       <tag class="PRP">you</tag>
-      <tag class="-NONE-">know</tag>
     </tags>
     <original><![CDATA[through the hold. Just so you know,]]></original>
   </line>

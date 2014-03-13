@@ -31,13 +31,11 @@
   </line>
   <line>
     <tags>
-      <tag class="-NONE-">Beamed</tag>
       <tag class="IN">from</tag>
       <tag class="WRB">where</tag>
       <tag class="EX">there</tag>
       <tag class="VBZ">is</tag>
       <tag class="DT">no</tag>
-      <tag class=":"></tag>
       <tag class="NN">thing</tag>
     </tags>
     <original><![CDATA[          Beamed, from where there is no - thing]]></original>

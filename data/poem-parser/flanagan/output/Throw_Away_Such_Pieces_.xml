@@ -53,10 +53,8 @@
   <line>
     <tags>
       <tag class="NN">extraction</tag>
-      <tag class=":"></tag>
       <tag class="NN">removal</tag>
       <tag class="NN">process</tag>
-      <tag class=":"></tag>
     </tags>
     <original><![CDATA[                  extraction :: removal process ::]]></original>
   </line>
@@ -74,11 +72,9 @@
   </line>
   <line>
     <tags>
-      <tag class="-NONE-">animal</tag>
       <tag class="RB">possibly</tag>
       <tag class="IN">at</tag>
       <tag class="NNS">times</tag>
-      <tag class="-NONE-">vegetable</tag>
     </tags>
     <original><![CDATA[      (person, animal, possibly at times vegetable)]]></original>
   </line>

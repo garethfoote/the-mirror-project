@@ -15,7 +15,6 @@
       <tag class="NN">ocean</tag>
       <tag class="CD">one</tag>
       <tag class="NN">man</tag>
-      <tag class="-NONE-">car-organized</tag>
       <tag class="DT">another</tag>
     </tags>
     <original><![CDATA[     big: ocean one man, car-organized; another]]></original>
@@ -37,7 +36,6 @@
   <line>
     <tags>
       <tag class="NNS">thinks</tag>
-      <tag class="-NONE-">otherwise</tag>
       <tag class="IN">on</tag>
       <tag class="DT">the</tag>
       <tag class="NNP">contrary</tag>
@@ -82,7 +80,6 @@
       <tag class="NN">ignorance</tag>
       <tag class="NNS">sits</tag>
       <tag class="RB">here</tag>
-      <tag class=":"></tag>
       <tag class="VBZ">is</tag>
       <tag class="VBN">based</tag>
       <tag class="RB">here</tag>
