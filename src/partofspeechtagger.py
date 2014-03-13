@@ -2,11 +2,12 @@
     Dependencies:
     pyyaml nltk numpy (http://nltk.org/install.html)
 """
-import re
+import re, string
 from collections import namedtuple
 from nltk.tag import pos_tag
-from nltk.tokenize import word_tokenize
+from nltk.tokenize import word_tokenize, WhitespaceTokenizer
 from nltk.data import load
+from nltk.corpus import stopwords
 from lxml import etree
 
 class PartOfSpeechTagger:
@@ -22,42 +23,39 @@ class PartOfSpeechTagger:
             self.wordtags = wordtags
 
     def tag(self, data):
+        # Only tokenize alphanumeric: http://stackoverflow.com/a/15555162/970059
         self.__data = data
-        self.tags = pos_tag(word_tokenize(data))
+        self.tags = pos_tag(WhitespaceTokenizer().tokenize(data))
         return self.tags
 
     def printAll(self):
         print self.tags
 
-    def getFormatted(self, format, asXML=True):
-        dataOut = ''
+    def getFormatted(self):
+        outputroot = etree.Element('tags')
 
         for tag in self.tags:
 
             # TODO - Accomodate for double quotation marks.
             # NLTK doesn't handle them as expected.
+            sp = string.punctuation
 
             # Find strpos of word
             strstart = self.__data.index(tag[0])
             strend = strstart + len(tag[0])
 
-            # If tag is in required type list.
-            if tag[1] not in [',','.'] and (len(self.wordtags) == 0 or tag[1] in self.wordtags):
-                output = format % (tag[1], tag[0])
-            else:
-                output = format % ("NONE", tag[0])
+            # Create child of tags.
+            currenttag = etree.SubElement(outputroot, "tag")
 
-            # Replace in original data string to
-            # ensure format retention (i.e. \n & \t)
-            dataOut  += self.__data[:strstart] + output
+            # If tag is in required type list.
+            if len(self.wordtags) == 0 or tag[1] in self.wordtags:
+                if tag[1] not in sp or tag[0] not in sp:
+                    currenttag.attrib['class'] = tag[1];
+                    currenttag.text = tag[0].strip(string.punctuation)
+
             self.__data = self.__data[strend:]
 
-        if asXML == True:
-            outputroot = etree.fromstring("<tags>"+dataOut+"</tags>")
-            outputtree = etree.ElementTree(outputroot)
-            dataOut = outputroot
-
-        return dataOut
+        return outputroot
 
 
     def getByClass(self):
@@ -120,11 +118,3 @@ class PartOfSpeechTagger:
             return '?'
 
         return data[0]
-
-    def findnth(self, haystack, needle, n):
-
-        # parts=re.split('\b(' + needle + ')\b', haystack, n+1)
-        parts = haystack.split(needle, n+1)
-        if len(parts)<=n+1:
-            return -1
-        return len(haystack)-len(parts[-1])-len(needle)

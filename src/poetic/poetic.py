@@ -11,14 +11,15 @@ class Poetic:
         self.__posTagger = PartOfSpeechTagger(wordTags)
 
     def start(self):
+        print "Traversing directory: " + self._config.input
         # If this is directory.
         if os.path.isdir( self._config.input ):
             self.createoutputdir(self._config.input);
 
             # Loop dir for files to parse.
             for f in os.listdir( self._config.input ):
-                if os.path.isfile( self._config.input + f ):
-                    self.parse( self._config.input + f )
+                if os.path.isfile( os.path.normpath(self._config.input) + os.sep + f ):
+                    self.parse( os.path.normpath(self._config.input) + os.sep + f )
 
         # else is a single file for parsing.
         else:
@@ -53,11 +54,11 @@ class Poetic:
 
         # Remove all newlines before passing to NLP lib.
         inputlines = self.__input.read().splitlines()
-        inputnolines = ' '.join([str(x).strip() for x in inputlines])
+        inputnolines = ' '.join([str(x).strip() for x in inputlines]).rstrip()
 
-        # Pass poem through NLP lib.
-        self.__posTagger.tag(inputnolines.rstrip());
-        output = self.__posTagger.getFormatted(self._config.format)
+        # Parse poem through NLP lib.
+        self.__posTagger.tag(inputnolines);
+        output = self.__posTagger.getFormatted()
         #print etree.tostring(output);
         # for element in output.iter():
             # print("%s - %s" % (element.tag, element.text))
