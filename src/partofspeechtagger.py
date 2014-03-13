@@ -44,14 +44,15 @@ class PartOfSpeechTagger:
             strstart = self.__data.index(tag[0])
             strend = strstart + len(tag[0])
 
-            # Create child of tags.
-            currenttag = etree.SubElement(outputroot, "tag")
-
             # If tag is in required type list.
             if len(self.wordtags) == 0 or tag[1] in self.wordtags:
-                if tag[1] not in sp or tag[0] not in sp:
+                if tag[1] not in sp and tag[0] not in sp and tag[1] != '-NONE-':
+                    currenttag = etree.SubElement(outputroot, "tag")
                     currenttag.attrib['class'] = tag[1];
                     currenttag.text = tag[0].strip(string.punctuation)
+
+            if tag[1] == '-NONE-':
+                print tag
 
             self.__data = self.__data[strend:]
 
