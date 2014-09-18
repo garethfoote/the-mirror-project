@@ -37,7 +37,7 @@
   </line>
   <line>
     <tags>
-      <tag class="JJ">yes</tag>
+      <tag class="-NONE-">yes</tag>
       <tag class="IN">in</tag>
       <tag class="NNP">something</tag>
     </tags>
@@ -191,6 +191,7 @@
   <line>
     <tags>
       <tag class="RB">then</tag>
+      <tag class="JJ">yes</tag>
       <tag class="EX">there</tag>
       <tag class="VBZ">is</tag>
     </tags>

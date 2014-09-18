@@ -122,7 +122,7 @@
       <tag class="EX">there</tag>
       <tag class="VBP">are</tag>
       <tag class="NNS">chairs</tag>
-      <tag class="DT">the</tag>
+      <tag class="-NONE-">there</tag>
       <tag class="CC">and</tag>
       <tag class="NNP">beds</tag>
       <tag class="CC">and</tag>
@@ -180,6 +180,7 @@
       <tag class="DT">A</tag>
       <tag class="NN">diner</tag>
       <tag class="VBN">called</tag>
+      <tag class="-NONE-">Andrea's</tag>
     </tags>
     <original><![CDATA[A diner called Andrea's]]></original>
   </line>
@@ -312,6 +313,7 @@
       <tag class="JJ">water-streaked</tag>
       <tag class="NNS">marks</tag>
       <tag class="IN">from</tag>
+      <tag class="DT">the</tag>
       <tag class="NNS">colors</tag>
       <tag class="IN">of</tag>
       <tag class="NNS">cars</tag>
