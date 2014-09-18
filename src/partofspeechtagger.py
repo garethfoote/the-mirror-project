@@ -46,11 +46,12 @@ class PartOfSpeechTagger:
 
             # If tag is in required type list.
             if len(self.wordtags) == 0 or tag[1] in self.wordtags:
-                if tag[1] not in sp and tag[0] not in sp and tag[1] != '-NONE-':
+                if tag[1] not in sp and tag[0] not in sp:
                     currenttag = etree.SubElement(outputroot, "tag")
                     currenttag.attrib['class'] = tag[1];
                     currenttag.text = tag[0].strip(string.punctuation)
 
+            # -NONE- tags are allowed through.
             if tag[1] == '-NONE-':
                 print tag
 

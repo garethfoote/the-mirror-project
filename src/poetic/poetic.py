@@ -59,9 +59,8 @@ class Poetic:
         # Parse poem through NLP lib.
         self.__posTagger.tag(inputnolines);
         output = self.__posTagger.getFormatted()
-        #print etree.tostring(output);
-        # for element in output.iter():
-            # print("%s - %s" % (element.tag, element.text))
+        # for element in output:
+        #     print("%s - %s" % (element.get('class'), element.text))
 
         # Create ElementTree root for output.
         outputroot = etree.Element("output")
@@ -76,9 +75,11 @@ class Poetic:
             originalnode = etree.SubElement(linenode, "original")
 
             # For each line break into words and extract class
-            # from NLP output.
+            # from NLP output. This assumes all words (excluding punctuation)
+            # has been assigned a class by the POS tagger; including the
+            # -NONE- class when a word can't be tagged.
             for word in line.split():
-                for el in output.iter():
+                for el in output:
                     eltext = str(el.text)
                     # print "Searching for: %s - %s" % (eltext, word[:len(eltext)])
                     if eltext == word[:len(eltext)]:
