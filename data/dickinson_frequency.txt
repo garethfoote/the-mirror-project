@@ -1,1 +1,0 @@
-['NN', 'NNP', 'PRP', 'CC', 'VBP', 'DT', 'IN', 'JJ', 'NNS', 'PRP$', 'TO', '-NONE-', 'VB', 'VBN', 'VBZ', '.', ':', 'RB', 'VBD', 'CD', 'EX', 'MD', 'RP', 'VBG']
