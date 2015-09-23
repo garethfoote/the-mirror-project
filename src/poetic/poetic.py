@@ -1,6 +1,6 @@
 from partofspeechtagger import PartOfSpeechTagger
 from lxml import etree
-import os, sys
+import re, os, sys
 from copy import deepcopy
 
 class Poetic:
@@ -53,7 +53,14 @@ class Poetic:
         outputf = open(self.__outputDir + bn, 'w+');
 
         # Remove all newlines before passing to NLP lib.
-        inputlines = self.__input.read().splitlines()
+        source = self.__input.read().decode('utf-8')
+        # Replaces Unicode right and left quotation mark with apostrophe
+        source = re.sub(u"(\u2018|\u2019)", "'", source)
+        # Replaces Unicode mdash and ndash
+        source = re.sub(u"(\u2013|\u2014)", "-", source)
+        # Below will ignore
+        source = source.encode('ascii', 'ignore')
+        inputlines = source.splitlines()
         inputnolines = ' '.join([str(x).strip() for x in inputlines]).rstrip()
 
         # Parse poem through NLP lib.
